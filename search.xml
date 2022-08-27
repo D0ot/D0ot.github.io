@@ -1,27 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Hello World</title>
-    <url>/2019/06/09/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/deployment.html">Deployment</a></p>
-]]></content>
-      <tags>
-        <tag>Start</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hello Hexo</title>
     <url>/2019/06/10/Hello-Hexo/</url>
     <content><![CDATA[<h1 id="Hello-Hexo"><a href="#Hello-Hexo" class="headerlink" title="Hello Hexo"></a>Hello Hexo</h1><hr>
@@ -189,6 +168,68 @@
       </tags>
   </entry>
   <entry>
+    <title>System Learning Daily 2</title>
+    <url>/2019/06/20/System-Learning-Daily-2/</url>
+    <content><![CDATA[<h2 id="X86-Calling-Convention"><a href="#X86-Calling-Convention" class="headerlink" title="X86 Calling Convention"></a>X86 Calling Convention</h2><p>上一篇Post最后有个疑问是，X86函数调用时，参数怎么传递，栈怎么管理。这些东西其实都是<code>Calling conventions</code>的内容[1]。</p>
+<span id="more"></span>
+
+<hr>
+<h2 id="修改-terminal-xxx"><a href="#修改-terminal-xxx" class="headerlink" title="修改 _terminal_xxx"></a>修改 _terminal_xxx</h2><p>主要的大范围改动就是把函数调用时的参数传递由用栈来传递，改为直接使用寄存器来传递。</p>
+<p>添加_terminal_putchar，支持屏幕的滚动。</p>
+<p>修改_terminal_show，使用_terminal_putchar来显示字符。</p>
+<p>具体实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">.global _terminal_putchar</span><br><span class="line">.type _terminal_putchar STT_FUNC</span><br><span class="line"><span class="comment">/*!</span></span><br><span class="line"><span class="comment">    \brief  put a char on screen</span></span><br><span class="line"><span class="comment">            it will read content in TER_ROW and TER_COL to get correct offset</span></span><br><span class="line"><span class="comment">    \param  al the char to put</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">_terminal_putchar:</span><br><span class="line">    cmp al, <span class="string">&#x27;\n&#x27;</span></span><br><span class="line">    je tp_s1</span><br><span class="line"></span><br><span class="line"><span class="comment">// the char is not newline</span></span><br><span class="line">tp_s0:</span><br><span class="line">    push ax</span><br><span class="line">    mov ax, [TER_ROW]</span><br><span class="line">    call _terminal_getoffset</span><br><span class="line">    shl ax</span><br><span class="line">    mov bx, ax</span><br><span class="line">    mov ax, VRAM</span><br><span class="line">    mov es, ax</span><br><span class="line">    pop ax</span><br><span class="line">    mov ah, DEFCOLOR</span><br><span class="line">    mov es:[bx], ax</span><br><span class="line">    cmp byte ptr [TER_COL], WIDTH - <span class="number">1</span></span><br><span class="line">    je tp_s1</span><br><span class="line">    inc byte ptr ds:[TER_COL]</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line"><span class="comment">// the cursor should be at next line.</span></span><br><span class="line">tp_s1:</span><br><span class="line">    cmp byte ptr [TER_ROW], HEIGHT - <span class="number">1</span></span><br><span class="line">    jne tp_s2</span><br><span class="line"></span><br><span class="line"><span class="comment">// should scroll</span></span><br><span class="line">    push ds</span><br><span class="line">    call _terminal_scroll</span><br><span class="line">    pop ds</span><br><span class="line">    mov bl, HEIGHT - <span class="number">1</span></span><br><span class="line">    call _terminal_clearline <span class="comment">// clear line at bottom</span></span><br><span class="line">    sub byte ptr [TER_ROW], <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//should not scroll</span></span><br><span class="line">tp_s2:</span><br><span class="line">    inc byte ptr [TER_ROW]</span><br><span class="line">    mov byte ptr [TER_COL], <span class="number">0</span></span><br><span class="line">    mov ax, [TER_ROW]</span><br><span class="line">    call _terminal_getoffset</span><br><span class="line">    call _terminal_setcur</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line">.global _terminal_scroll</span><br><span class="line">.type _terminal_scroll STT_FUNC</span><br><span class="line"><span class="comment">/*!</span></span><br><span class="line"><span class="comment">    /brief  scroll the screen one line up</span></span><br><span class="line"><span class="comment">            it will not modify the TER_ROW and TER_COL</span></span><br><span class="line"><span class="comment">            it will not clear the line at bottom</span></span><br><span class="line"><span class="comment">            WARNING: it will change &quot;ds&quot; register</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">_terminal_scroll:</span><br><span class="line">    mov cx, ( (HEIGHT - <span class="number">1</span>) * WIDTH) / <span class="number">2</span></span><br><span class="line">    mov ax, VRAM</span><br><span class="line">    cld</span><br><span class="line">    mov ds, ax</span><br><span class="line">    mov es, ax</span><br><span class="line">    mov si, WIDTH * <span class="number">2</span></span><br><span class="line">    mov di, <span class="number">0</span></span><br><span class="line">    rep movsw</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
+
+<h2 id="开始使用Makefile"><a href="#开始使用Makefile" class="headerlink" title="开始使用Makefile"></a>开始使用Makefile</h2><p>不用CMake的原因是，汇编源文件和C源文件混合编译不太好搞（我太菜了）。不如Make来得直接。在子文件夹里面Make生成bin文件，在根文件夹里面把bin文件合成，并且拷贝到build文件夹。细节就不写出来了，没什么技术水平。</p>
+<h2 id="关于-“Call”-指令"><a href="#关于-“Call”-指令" class="headerlink" title="关于 “Call” 指令"></a>关于 “Call” 指令</h2><p>GUN AS, Intel Syntax</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">.section .data</span><br><span class="line"></span><br><span class="line">_buf1:</span><br><span class="line">.word <span class="number">0x10</span></span><br><span class="line"></span><br><span class="line">_buf2:</span><br><span class="line">.word <span class="number">0x20</span></span><br><span class="line"></span><br><span class="line">_buf3:</span><br><span class="line">.word <span class="number">0xCC</span></span><br><span class="line"></span><br><span class="line">.type _func STT_FUNC</span><br><span class="line">_func:</span><br><span class="line">    <span class="keyword">xor</span> ax, ax</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line">.section .text</span><br><span class="line">_start:</span><br><span class="line"></span><br><span class="line">    mov ax, _buf1</span><br><span class="line">    mov bx, _buf2</span><br><span class="line">    mov cx, _buf3</span><br></pre></td></tr></table></figure>
+
+<p>此时，<code>ax</code>，<code>bx</code>，<code>cx</code>的值分别为：0x10，0x20，0xCC。这里，GAS <code>mov</code> 的是内存中的内容，然后</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">mov ax, OFFSET _buf1</span><br><span class="line">mov bx, OFFSET _buf2</span><br><span class="line">mov cx, OFFSET _buf3</span><br></pre></td></tr></table></figure>
+
+<p>此时，我们假定<code>.data</code>段从0x00开始，那么，<code>ax</code>，<code>bx</code>，<code>cx</code>的值会是0x00，0x02，0x04。也就是说，我们用<code>OFFSET</code>，可以得到<em>label</em>的地址。<strong>（此处存疑，OFFSET获得的是相对于段的偏移？还是获得绝对地址？似乎是获得绝对地址）</strong></p>
+<p>现在让我们来考虑<code>call</code>指令的情况：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">call _func</span><br></pre></td></tr></table></figure>
+
+<p>这显然是直接调用 _func，然后看下个例子：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">mov bx, OFFSET _func</span><br><span class="line">mov _buf1, bx</span><br><span class="line">call _buf1</span><br><span class="line">call [_buf1]</span><br></pre></td></tr></table></figure>
+
+<p>现在 <code>_buf1</code> 中存储了 <code>_func</code> 的地址。现在有上面两种写法，第一种是错的，第二种写法是对的。第一种写法就是 <code>call label</code>，第二种写法才是我们想要的：“取出<code>_buf</code>中存储的地址，<code>jmp</code>到该地址。”。</p>
+<p>这说明：在<code>mov</code>指令中和在<code>call</code>指令中出现的<em>label</em>会被GAS区别对待，他们有着不同的解释。</p>
+<p>这个问题确实困扰了我好一会。</p>
+<hr>
+<h2 id="关于-“jmp-label”"><a href="#关于-“jmp-label”" class="headerlink" title="关于 “jmp label”"></a>关于 “jmp label”</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">_start:</span><br><span class="line">    jmp label</span><br><span class="line">    jmp <span class="type">short</span> label</span><br><span class="line">label:</span><br><span class="line">    hlt</span><br><span class="line">    jmp label</span><br></pre></td></tr></table></figure>
+
+<p>这种直接<code>jmp label</code>的写法产生的机器码里面是没有绝对地址的，有的只是相对地址。把《汇编语言》[2]上面的一个例子拿过来(P.180 图9.3 转移位移的计算方法)</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">偏移地址     机器码                   汇编指令</span><br><span class="line"><span class="number">0000</span>        <span class="number">40</span>                  s:  inc ax</span><br><span class="line"><span class="number">0001</span>        EB03                    jmp s0</span><br><span class="line"><span class="number">0003</span>        BB0300                  mov bx, <span class="number">3</span></span><br><span class="line"><span class="number">0006</span>        <span class="number">43</span>                  s0: inc bx</span><br><span class="line"><span class="number">0007</span>        EBF7                    jmp s</span><br><span class="line"><span class="number">0009</span>        <span class="number">90</span>                      nop</span><br></pre></td></tr></table></figure>
+
+<p>这里0001偏移处的<code>jmp s0</code>指令生成的机器码是<code>EB03</code>，后面的<code>0x03</code>就是相对偏移地址。</p>
+<p>为什么是<code>03</code>呢？<code>0006 - 0001 = 5</code>才对啊。其实8086处理器在将机器码放入缓冲区之后（还未执行改指令），就更新了<code>IP</code>寄存器的数值，所以在执行的时候<code>IP</code>的值已经是<code>0x03</code>了，所以编译器就把<code>0x03</code>放到了指令中。后面的<code>0xF7</code>是<code>-9</code>的补码，<code>0009 - 9 = 0000</code>，正好跳到了第一条指令。如果是有着多级流水线（Pipelining）的处理器，情况会变得更加复杂一些，在这里就不废话了（不瞎说了）[3]。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总结一下以前的疑问：</p>
+<ol>
+<li><a href="/2019/06/18/System-Learning-Daily-1">System Learning Daily 1</a>， 疑问1的解答，就是该篇标题。</li>
+</ol>
+<p>新的疑问：</p>
+<ol>
+<li>不同的<code>call near, far</code>和<code>ret, retf</code>如何匹配。</li>
+</ol>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><blockquote>
+<ol>
+<li>Wikipedia, <a href="https://en.wikipedia.org/wiki/X86_calling_conventions">“x86 calling conventions”</a></li>
+<li>王爽，《汇编语言》</li>
+<li>NCCGROUP, <a href="https://www.nccgroup.trust/us/about-us/newsroom-and-events/blog/2011/september/arm-pipeline-and-gdb-oh-my/">“ARM, Pipeline and GDB, Oh My!”</a></li>
+</ol>
+</blockquote>
+<h2 id="Updates"><a href="#Updates" class="headerlink" title="Updates"></a>Updates</h2><blockquote>
+<p>2019-6-21<br>Add more content and publish the post.</p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>x86</tag>
+        <tag>system</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>System Learning Daily 1</title>
     <url>/2019/06/18/System-Learning-Daily-1/</url>
     <content><![CDATA[<h2 id="Boot-Sector"><a href="#Boot-Sector" class="headerlink" title="Boot Sector"></a>Boot Sector</h2><p>引导扇区是硬盘的第一个扇区，通常大小是512Byte，里面放着的是MBR(Master Boot Record)</p>
@@ -253,68 +294,6 @@
 <hr>
 <h2 id="Update"><a href="#Update" class="headerlink" title="Update"></a>Update</h2><blockquote>
 <p>2019-6-20<br>fix warnings in markdownlint.</p>
-</blockquote>
-]]></content>
-      <tags>
-        <tag>x86</tag>
-        <tag>system</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>System Learning Daily 2</title>
-    <url>/2019/06/20/System-Learning-Daily-2/</url>
-    <content><![CDATA[<h2 id="X86-Calling-Convention"><a href="#X86-Calling-Convention" class="headerlink" title="X86 Calling Convention"></a>X86 Calling Convention</h2><p>上一篇Post最后有个疑问是，X86函数调用时，参数怎么传递，栈怎么管理。这些东西其实都是<code>Calling conventions</code>的内容[1]。</p>
-<span id="more"></span>
-
-<hr>
-<h2 id="修改-terminal-xxx"><a href="#修改-terminal-xxx" class="headerlink" title="修改 _terminal_xxx"></a>修改 _terminal_xxx</h2><p>主要的大范围改动就是把函数调用时的参数传递由用栈来传递，改为直接使用寄存器来传递。</p>
-<p>添加_terminal_putchar，支持屏幕的滚动。</p>
-<p>修改_terminal_show，使用_terminal_putchar来显示字符。</p>
-<p>具体实现如下：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">.global _terminal_putchar</span><br><span class="line">.type _terminal_putchar STT_FUNC</span><br><span class="line"><span class="comment">/*!</span></span><br><span class="line"><span class="comment">    \brief  put a char on screen</span></span><br><span class="line"><span class="comment">            it will read content in TER_ROW and TER_COL to get correct offset</span></span><br><span class="line"><span class="comment">    \param  al the char to put</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">_terminal_putchar:</span><br><span class="line">    cmp al, <span class="string">&#x27;\n&#x27;</span></span><br><span class="line">    je tp_s1</span><br><span class="line"></span><br><span class="line"><span class="comment">// the char is not newline</span></span><br><span class="line">tp_s0:</span><br><span class="line">    push ax</span><br><span class="line">    mov ax, [TER_ROW]</span><br><span class="line">    call _terminal_getoffset</span><br><span class="line">    shl ax</span><br><span class="line">    mov bx, ax</span><br><span class="line">    mov ax, VRAM</span><br><span class="line">    mov es, ax</span><br><span class="line">    pop ax</span><br><span class="line">    mov ah, DEFCOLOR</span><br><span class="line">    mov es:[bx], ax</span><br><span class="line">    cmp byte ptr [TER_COL], WIDTH - <span class="number">1</span></span><br><span class="line">    je tp_s1</span><br><span class="line">    inc byte ptr ds:[TER_COL]</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line"><span class="comment">// the cursor should be at next line.</span></span><br><span class="line">tp_s1:</span><br><span class="line">    cmp byte ptr [TER_ROW], HEIGHT - <span class="number">1</span></span><br><span class="line">    jne tp_s2</span><br><span class="line"></span><br><span class="line"><span class="comment">// should scroll</span></span><br><span class="line">    push ds</span><br><span class="line">    call _terminal_scroll</span><br><span class="line">    pop ds</span><br><span class="line">    mov bl, HEIGHT - <span class="number">1</span></span><br><span class="line">    call _terminal_clearline <span class="comment">// clear line at bottom</span></span><br><span class="line">    sub byte ptr [TER_ROW], <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//should not scroll</span></span><br><span class="line">tp_s2:</span><br><span class="line">    inc byte ptr [TER_ROW]</span><br><span class="line">    mov byte ptr [TER_COL], <span class="number">0</span></span><br><span class="line">    mov ax, [TER_ROW]</span><br><span class="line">    call _terminal_getoffset</span><br><span class="line">    call _terminal_setcur</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line">.global _terminal_scroll</span><br><span class="line">.type _terminal_scroll STT_FUNC</span><br><span class="line"><span class="comment">/*!</span></span><br><span class="line"><span class="comment">    /brief  scroll the screen one line up</span></span><br><span class="line"><span class="comment">            it will not modify the TER_ROW and TER_COL</span></span><br><span class="line"><span class="comment">            it will not clear the line at bottom</span></span><br><span class="line"><span class="comment">            WARNING: it will change &quot;ds&quot; register</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">_terminal_scroll:</span><br><span class="line">    mov cx, ( (HEIGHT - <span class="number">1</span>) * WIDTH) / <span class="number">2</span></span><br><span class="line">    mov ax, VRAM</span><br><span class="line">    cld</span><br><span class="line">    mov ds, ax</span><br><span class="line">    mov es, ax</span><br><span class="line">    mov si, WIDTH * <span class="number">2</span></span><br><span class="line">    mov di, <span class="number">0</span></span><br><span class="line">    rep movsw</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
-
-<h2 id="开始使用Makefile"><a href="#开始使用Makefile" class="headerlink" title="开始使用Makefile"></a>开始使用Makefile</h2><p>不用CMake的原因是，汇编源文件和C源文件混合编译不太好搞（我太菜了）。不如Make来得直接。在子文件夹里面Make生成bin文件，在根文件夹里面把bin文件合成，并且拷贝到build文件夹。细节就不写出来了，没什么技术水平。</p>
-<h2 id="关于-“Call”-指令"><a href="#关于-“Call”-指令" class="headerlink" title="关于 “Call” 指令"></a>关于 “Call” 指令</h2><p>GUN AS, Intel Syntax</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">.section .data</span><br><span class="line"></span><br><span class="line">_buf1:</span><br><span class="line">.word <span class="number">0x10</span></span><br><span class="line"></span><br><span class="line">_buf2:</span><br><span class="line">.word <span class="number">0x20</span></span><br><span class="line"></span><br><span class="line">_buf3:</span><br><span class="line">.word <span class="number">0xCC</span></span><br><span class="line"></span><br><span class="line">.type _func STT_FUNC</span><br><span class="line">_func:</span><br><span class="line">    <span class="keyword">xor</span> ax, ax</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line">.section .text</span><br><span class="line">_start:</span><br><span class="line"></span><br><span class="line">    mov ax, _buf1</span><br><span class="line">    mov bx, _buf2</span><br><span class="line">    mov cx, _buf3</span><br></pre></td></tr></table></figure>
-
-<p>此时，<code>ax</code>，<code>bx</code>，<code>cx</code>的值分别为：0x10，0x20，0xCC。这里，GAS <code>mov</code> 的是内存中的内容，然后</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">mov ax, OFFSET _buf1</span><br><span class="line">mov bx, OFFSET _buf2</span><br><span class="line">mov cx, OFFSET _buf3</span><br></pre></td></tr></table></figure>
-
-<p>此时，我们假定<code>.data</code>段从0x00开始，那么，<code>ax</code>，<code>bx</code>，<code>cx</code>的值会是0x00，0x02，0x04。也就是说，我们用<code>OFFSET</code>，可以得到<em>label</em>的地址。<strong>（此处存疑，OFFSET获得的是相对于段的偏移？还是获得绝对地址？似乎是获得绝对地址）</strong></p>
-<p>现在让我们来考虑<code>call</code>指令的情况：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">call _func</span><br></pre></td></tr></table></figure>
-
-<p>这显然是直接调用 _func，然后看下个例子：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">mov bx, OFFSET _func</span><br><span class="line">mov _buf1, bx</span><br><span class="line">call _buf1</span><br><span class="line">call [_buf1]</span><br></pre></td></tr></table></figure>
-
-<p>现在 <code>_buf1</code> 中存储了 <code>_func</code> 的地址。现在有上面两种写法，第一种是错的，第二种写法是对的。第一种写法就是 <code>call label</code>，第二种写法才是我们想要的：“取出<code>_buf</code>中存储的地址，<code>jmp</code>到该地址。”。</p>
-<p>这说明：在<code>mov</code>指令中和在<code>call</code>指令中出现的<em>label</em>会被GAS区别对待，他们有着不同的解释。</p>
-<p>这个问题确实困扰了我好一会。</p>
-<hr>
-<h2 id="关于-“jmp-label”"><a href="#关于-“jmp-label”" class="headerlink" title="关于 “jmp label”"></a>关于 “jmp label”</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">_start:</span><br><span class="line">    jmp label</span><br><span class="line">    jmp <span class="type">short</span> label</span><br><span class="line">label:</span><br><span class="line">    hlt</span><br><span class="line">    jmp label</span><br></pre></td></tr></table></figure>
-
-<p>这种直接<code>jmp label</code>的写法产生的机器码里面是没有绝对地址的，有的只是相对地址。把《汇编语言》[2]上面的一个例子拿过来(P.180 图9.3 转移位移的计算方法)</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">偏移地址     机器码                   汇编指令</span><br><span class="line"><span class="number">0000</span>        <span class="number">40</span>                  s:  inc ax</span><br><span class="line"><span class="number">0001</span>        EB03                    jmp s0</span><br><span class="line"><span class="number">0003</span>        BB0300                  mov bx, <span class="number">3</span></span><br><span class="line"><span class="number">0006</span>        <span class="number">43</span>                  s0: inc bx</span><br><span class="line"><span class="number">0007</span>        EBF7                    jmp s</span><br><span class="line"><span class="number">0009</span>        <span class="number">90</span>                      nop</span><br></pre></td></tr></table></figure>
-
-<p>这里0001偏移处的<code>jmp s0</code>指令生成的机器码是<code>EB03</code>，后面的<code>0x03</code>就是相对偏移地址。</p>
-<p>为什么是<code>03</code>呢？<code>0006 - 0001 = 5</code>才对啊。其实8086处理器在将机器码放入缓冲区之后（还未执行改指令），就更新了<code>IP</code>寄存器的数值，所以在执行的时候<code>IP</code>的值已经是<code>0x03</code>了，所以编译器就把<code>0x03</code>放到了指令中。后面的<code>0xF7</code>是<code>-9</code>的补码，<code>0009 - 9 = 0000</code>，正好跳到了第一条指令。如果是有着多级流水线（Pipelining）的处理器，情况会变得更加复杂一些，在这里就不废话了（不瞎说了）[3]。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总结一下以前的疑问：</p>
-<ol>
-<li><a href="/2019/06/18/System-Learning-Daily-1">System Learning Daily 1</a>， 疑问1的解答，就是该篇标题。</li>
-</ol>
-<p>新的疑问：</p>
-<ol>
-<li>不同的<code>call near, far</code>和<code>ret, retf</code>如何匹配。</li>
-</ol>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><blockquote>
-<ol>
-<li>Wikipedia, <a href="https://en.wikipedia.org/wiki/X86_calling_conventions">“x86 calling conventions”</a></li>
-<li>王爽，《汇编语言》</li>
-<li>NCCGROUP, <a href="https://www.nccgroup.trust/us/about-us/newsroom-and-events/blog/2011/september/arm-pipeline-and-gdb-oh-my/">“ARM, Pipeline and GDB, Oh My!”</a></li>
-</ol>
-</blockquote>
-<h2 id="Updates"><a href="#Updates" class="headerlink" title="Updates"></a>Updates</h2><blockquote>
-<p>2019-6-21<br>Add more content and publish the post.</p>
 </blockquote>
 ]]></content>
       <tags>
@@ -580,6 +559,27 @@
         <tag>x86</tag>
         <tag>asm</tag>
         <tag>gcc</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2019/06/09/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/deployment.html">Deployment</a></p>
+]]></content>
+      <tags>
+        <tag>Start</tag>
       </tags>
   </entry>
   <entry>

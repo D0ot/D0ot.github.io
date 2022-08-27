@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha256-xejo6yLi6vGtAjcMIsY8BHdKsLg7QynVlFMzdQgUuy8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"d0ot.github.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.12.3","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="记录一些想法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="System Learning Daily 4">
+<meta property="og:url" content="https://d0ot.github.com/2020/05/02/System-Learning-Daily-4/index.html">
+<meta property="og:site_name" content="Doot&#39;s Blog">
+<meta property="og:description" content="记录一些想法。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-05-02T04:32:54.000Z">
+<meta property="article:modified_time" content="2020-05-02T04:32:54.000Z">
+<meta property="article:author" content="d0ot">
+<meta property="article:tag" content="x86">
+<meta property="article:tag" content="system">
+<meta property="article:tag" content="debug">
+<meta property="article:tag" content="gdb">
+<meta property="article:tag" content="qemu">
+<meta property="article:tag" content="bochs">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://d0ot.github.com/2020/05/02/System-Learning-Daily-4/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://d0ot.github.com/2020/05/02/System-Learning-Daily-4/","path":"2020/05/02/System-Learning-Daily-4/","title":"System Learning Daily 4"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>System Learning Daily 4 | Doot's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Doot's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8EQEMU%E5%92%8CBochs%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">1.</span> <span class="nav-text">关于QEMU和Bochs的选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E9%99%90%E5%BE%AA%E7%8E%AF%E5%BC%95%E5%8F%91GP"><span class="nav-number">2.</span> <span class="nav-text">无限循环引发GP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CMake%E5%92%8CMake%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">3.</span> <span class="nav-text">CMake和Make的选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linker-Script%E5%B9%B6%E4%B8%8D%E9%9A%BE"><span class="nav-number">4.</span> <span class="nav-text">Linker Script并不难</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E8%A6%81%E7%94%A8ELF%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">内核要用ELF文件格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Just-for-Fun"><span class="nav-number">6.</span> <span class="nav-text">Just for Fun</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">d0ot</p>
+  <div class="site-description" itemprop="description">random writings</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://d0ot.github.com/2020/05/02/System-Learning-Daily-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="d0ot">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Doot's Blog">
+      <meta itemprop="description" content="random writings">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="System Learning Daily 4 | Doot's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          System Learning Daily 4
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2020-05-02 12:32:54" itemprop="dateCreated datePublished" datetime="2020-05-02T12:32:54+08:00">2020-05-02</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>记录一些想法。</p>
+<span id="more"></span>
+
+<h2 id="关于QEMU和Bochs的选择"><a href="#关于QEMU和Bochs的选择" class="headerlink" title="关于QEMU和Bochs的选择"></a>关于QEMU和Bochs的选择</h2><ol>
+<li>根据我自己的观察，使用Bochs的人似乎更多一些。我自己却是使用QEMU + GDB。</li>
+<li>Bochs的优势在于调试这种裸机程序很好用。例如，在Bochs自带的调试器里面使用<code>info gdt</code>直接可以查看gdt，相较于QEMU + GDD更方便。</li>
+<li>QEMU + GDB的好处就是可以借助GDB的强大功能，Bochs也可以使用GDB，但是必须关闭自带的调试器才行。而QEMU则可以两者同时使用。</li>
+<li>两者的行为有些地方也不一致，例如QEMU默认的IF是set的，Bochs的IF是clear的。</li>
+</ol>
+<h2 id="无限循环引发GP"><a href="#无限循环引发GP" class="headerlink" title="无限循环引发GP"></a>无限循环引发GP</h2><p>GP就是<code>General Protection Exception</code>这个问题应该在我之前的项目中就出现过，不过我没有发现。这次发现主要是使用了QEMU的 <code>-d</code> 和 <code>-D</code> 选项，在处理器发生reset或者interrupt的时候打出log。</p>
+<p>记录一下自己发现的过程。</p>
+<ol>
+<li>在实模式下面，<code>jmp $</code>不会引发GP</li>
+<li>在保护模式下面，QEMU在运行到<code>jmp $</code>的时候直接重启Guest OS。</li>
+<li>使用<code>-d int,cpu_reset</code> 和 <code>-D qemu.log</code>来查log发现是<code>triple fault</code>导致的重启。</li>
+<li><code>triple fault</code>发生的原因是两次<code>GP</code>加上一个<code>double fault</code>，参考了这个帖子<a target="_blank" rel="noopener" href="https://www.reddit.com/r/osdev/comments/67i6rf/using_qemu_on_a_regular_executable_runs_fine_but/">Reddit</a>。</li>
+<li>让人疑惑的事情是，如果在gdb中使用<code>continue</code>则会出问题，如果使用<code>step</code>则不会出问题。<code>IF</code> set之后会出问题，<code>IF</code> clear之后不会出问题。在OSDev已经发帖问了。不清楚这究竟是处理器的机制还是我自己写的代码有问题。</li>
+</ol>
+<h2 id="CMake和Make的选择"><a href="#CMake和Make的选择" class="headerlink" title="CMake和Make的选择"></a>CMake和Make的选择</h2><p>写这种东西还是Make比较好用。CMake写起来是真的繁琐。还需要<code>add_custom_target</code>，语法噪音很多。不如Make直接一个target后面直接放上去命令来的简单明快。</p>
+<h2 id="Linker-Script并不难"><a href="#Linker-Script并不难" class="headerlink" title="Linker Script并不难"></a>Linker Script并不难</h2><p>想不通几个月前的自己竟然浪费了不少时间在这个上面。</p>
+<h2 id="内核要用ELF文件格式"><a href="#内核要用ELF文件格式" class="headerlink" title="内核要用ELF文件格式"></a>内核要用ELF文件格式</h2><p>之前使用的就是一个flat binary，刚开始还好，再往后就很容易出问题。非常不好管理。</p>
+<h2 id="Just-for-Fun"><a href="#Just-for-Fun" class="headerlink" title="Just for Fun"></a>Just for Fun</h2><p>哪怕是对操作系统感兴趣，写起来遇到问题也是足够让人难受了。</p>
+<p>得让自己开心。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/x86/" rel="tag"># x86</a>
+              <a href="/tags/system/" rel="tag"># system</a>
+              <a href="/tags/debug/" rel="tag"># debug</a>
+              <a href="/tags/gdb/" rel="tag"># gdb</a>
+              <a href="/tags/qemu/" rel="tag"># qemu</a>
+              <a href="/tags/bochs/" rel="tag"># bochs</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/04/30/Notes-about-linker-script/" rel="prev" title="Notes About Linker Script">
+                  <i class="fa fa-chevron-left"></i> Notes About Linker Script
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/05/03/System-Learning-Daily-5/" rel="next" title="System Learning Daily 5">
+                  System Learning Daily 5 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">d0ot</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

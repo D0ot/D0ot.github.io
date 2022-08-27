@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha256-xejo6yLi6vGtAjcMIsY8BHdKsLg7QynVlFMzdQgUuy8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"d0ot.github.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.12.3","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="瞎写现在都快两点了,不怎么困… 今天也是摸鱼的一天… 其实还是有些收获的，至少怎么写链接脚本，怎么写MBR扇区的代码，还算是了解了一点点。(并没有学习x86汇编) 总结一下吧。  总结东西很杂，就随便记录一下 i386 裸机环境搭建1. 编译 binutils  2. 编译 gcc  binutils 和 gcc 的源码可以去清华[1]或者科大的镜像站上面找，编译主要就是下面这几句： 123456">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录x86汇编的学习">
+<meta property="og:url" content="https://d0ot.github.com/2019/06/17/%E8%AE%B0%E5%BD%95x86%E6%B1%87%E7%BC%96%E7%9A%84%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Doot&#39;s Blog">
+<meta property="og:description" content="瞎写现在都快两点了,不怎么困… 今天也是摸鱼的一天… 其实还是有些收获的，至少怎么写链接脚本，怎么写MBR扇区的代码，还算是了解了一点点。(并没有学习x86汇编) 总结一下吧。  总结东西很杂，就随便记录一下 i386 裸机环境搭建1. 编译 binutils  2. 编译 gcc  binutils 和 gcc 的源码可以去清华[1]或者科大的镜像站上面找，编译主要就是下面这几句： 123456">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-06-16T17:29:23.000Z">
+<meta property="article:modified_time" content="2019-06-16T17:29:23.000Z">
+<meta property="article:author" content="d0ot">
+<meta property="article:tag" content="x86">
+<meta property="article:tag" content="system">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://d0ot.github.com/2019/06/17/%E8%AE%B0%E5%BD%95x86%E6%B1%87%E7%BC%96%E7%9A%84%E5%AD%A6%E4%B9%A0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://d0ot.github.com/2019/06/17/%E8%AE%B0%E5%BD%95x86%E6%B1%87%E7%BC%96%E7%9A%84%E5%AD%A6%E4%B9%A0/","path":"2019/06/17/记录x86汇编的学习/","title":"记录x86汇编的学习"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>记录x86汇编的学习 | Doot's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Doot's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9E%8E%E5%86%99"><span class="nav-number">1.</span> <span class="nav-text">瞎写</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#i386-%E8%A3%B8%E6%9C%BA%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">2.0.1.</span> <span class="nav-text">i386 裸机环境搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8Ex86%E6%B1%87%E7%BC%96%E7%9A%84%E2%80%9C%E6%96%B9%E8%A8%80%E2%80%9D"><span class="nav-number">2.0.2.</span> <span class="nav-text">关于x86汇编的“方言”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E9%93%BE%E6%8E%A5%E8%84%9A%E6%9C%AC"><span class="nav-number">2.0.3.</span> <span class="nav-text">关于链接脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MBR%E5%BC%95%E5%AF%BC%E4%BB%A3%E7%A0%81"><span class="nav-number">2.0.4.</span> <span class="nav-text">MBR引导代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Reference"><span class="nav-number">2.0.5.</span> <span class="nav-text">Reference</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">d0ot</p>
+  <div class="site-description" itemprop="description">random writings</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://d0ot.github.com/2019/06/17/%E8%AE%B0%E5%BD%95x86%E6%B1%87%E7%BC%96%E7%9A%84%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="d0ot">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Doot's Blog">
+      <meta itemprop="description" content="random writings">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="记录x86汇编的学习 | Doot's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          记录x86汇编的学习
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2019-06-17 01:29:23" itemprop="dateCreated datePublished" datetime="2019-06-17T01:29:23+08:00">2019-06-17</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="瞎写"><a href="#瞎写" class="headerlink" title="瞎写"></a>瞎写</h1><p>现在都快两点了,不怎么困…</p>
+<p>今天也是摸鱼的一天…</p>
+<p>其实还是有些收获的，至少怎么写链接脚本，怎么写MBR扇区的代码，还算是了解了一点点。(并没有学习x86汇编)</p>
+<p>总结一下吧。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><strong>东西很杂，就随便记录一下</strong></p>
+<h3 id="i386-裸机环境搭建"><a href="#i386-裸机环境搭建" class="headerlink" title="i386 裸机环境搭建"></a>i386 裸机环境搭建</h3><pre><code>1. 编译 binutils
+
+2. 编译 gcc
+</code></pre>
+<p>binutils 和 gcc 的源码可以去清华[1]或者科大的镜像站上面找，编译主要就是下面这几句：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Varibale Settings</span></span><br><span class="line">export PREFIX=/usr/local/install_path</span><br><span class="line">export TARGET=i686-elf</span><br><span class="line">export PATH=&quot;$&#123;PREIFX&#125;/bin:$&#123;PATH&#125;&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">binutils configure</span></span><br><span class="line">binutils-xxx/configure --target=$TARGET --prefix=&quot;$PREFIX&quot; --with-sysroot --disable-werror</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">gcc configure</span></span><br><span class="line">gcc-xxx/configure --target=$TARGET --prefix=&quot;$PREFIX&quot; --enable-languages=c,c++ --without-headers</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>上面的内容是经过简化的，没把</p>
+<blockquote>
+<p>make<br>sudo make install</p>
+</blockquote>
+<p>写在里面，配置选项也很简单。</p>
+<p>具体内容可以在 <em>OSDev Wiki</em> [2]上面找到，我就不写(抄)了。</p>
+<h3 id="关于x86汇编的“方言”"><a href="#关于x86汇编的“方言”" class="headerlink" title="关于x86汇编的“方言”"></a>关于x86汇编的“方言”</h3><p>其实是两种语法(syntax)：</p>
+<blockquote>
+<p>AT&amp;A 和 Intel</p>
+</blockquote>
+<p>我是最近刚看的《汇编语言》第三版，上面讲的是 <em>Intel</em> 语法，而我打算用GAS来做汇编器，GAS默认使用 <em>AT&amp;T</em> 语法,这让我刚开始很困扰。不过后来我发现可以用一些编译指令[3]来使用 <em>Intel</em> 语法。这也不算个问题了。</p>
+<h3 id="关于链接脚本"><a href="#关于链接脚本" class="headerlink" title="关于链接脚本"></a>关于链接脚本</h3><p>如何把MagicNumber放到最后面就是用的链接脚本。链接脚本指导连接器如何从对象文件里面获取所需要的内容，如何将这些内容在输出的文件中进行布局。具体参考官方手册[4]。</p>
+<h3 id="MBR引导代码"><a href="#MBR引导代码" class="headerlink" title="MBR引导代码"></a>MBR引导代码</h3><p>大概半年前我才装上Ununtu真机。以前都是用虚拟机。装的时候搞出了点事情，发现我自己用的不是UEFI启动。用的还是Legacy BIOS。然后我就重新建立ESP分区，把Win10和Ubuntu的引导扔进去，加上GRUB。其实这里面的东西也能写一篇博客，因为遇到的问题还是挺多的。</p>
+<p>MBR 是给 Legacy BIOS用的。存储设备的第一个扇区(Sector)的最后两个字节是<code>0x55</code>和<code>0xaa</code>，就会被BIOS当成一个可以启动的设备，BIOS将其512KiB加载到 0x0000:0x7c00 然后从这里开始运行。所以关键就是用链接脚本把 magic number 放到最后面，<code>.text</code> 放到最前面就好了。</p>
+<p>给一个简单的小例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">SECTIONS</span><br><span class="line">&#123;</span><br><span class="line">    /* BIOS will jump to here to run */</span><br><span class="line">    . = 0x00;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    .text :</span><br><span class="line">    &#123;</span><br><span class="line"></span><br><span class="line">        *(.text)</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    allsize = ABSOLUTE(.);</span><br><span class="line">    .mbrcheck : </span><br><span class="line">    &#123;</span><br><span class="line">        </span><br><span class="line">        . = 512K - allsize - 2;</span><br><span class="line">        boot.o(.mbrcheck)</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>链接的结果是生成ELF文件，用objcopy把没用的ELF头和符号表给去掉，生成Binary文件。这时候就可以尝试用Qemu来模拟了。</p>
+<hr>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ol>
+<li>清华大学开源软件镜像站, “Index of &#x2F;gnu&#x2F;“, <a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/gnu/">https://mirrors.tuna.tsinghua.edu.cn/gnu/</a></li>
+<li>OSDev-Wiki, “GCC Cross-Compiler”, <a target="_blank" rel="noopener" href="https://wiki.osdev.org/GCC_Cross-Compiler">https://wiki.osdev.org/GCC_Cross-Compiler</a></li>
+<li>Stackoverflow, “Can I use Intel syntax of x86 assembly with GCC?”, <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/9347909/can-i-use-intel-syntax-of-x86-assembly-with-gcc">https://stackoverflow.com/questions/9347909/can-i-use-intel-syntax-of-x86-assembly-with-gcc</a></li>
+<li>Sourceware, “ld-docs”, <a target="_blank" rel="noopener" href="https://sourceware.org/binutils/docs/ld/index.html">https://sourceware.org/binutils/docs/ld/index.html</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/x86/" rel="tag"># x86</a>
+              <a href="/tags/system/" rel="tag"># system</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/06/10/Hello-Hexo/" rel="prev" title="Hello Hexo">
+                  <i class="fa fa-chevron-left"></i> Hello Hexo
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/06/18/System-Learning-Daily-1/" rel="next" title="System Learning Daily 1">
+                  System Learning Daily 1 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">d0ot</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

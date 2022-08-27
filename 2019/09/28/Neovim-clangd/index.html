@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha256-xejo6yLi6vGtAjcMIsY8BHdKsLg7QynVlFMzdQgUuy8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"d0ot.github.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.12.3","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="For Productivity!!!">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Neovim + clangd Configuration">
+<meta property="og:url" content="https://d0ot.github.com/2019/09/28/Neovim-clangd/index.html">
+<meta property="og:site_name" content="Doot&#39;s Blog">
+<meta property="og:description" content="For Productivity!!!">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-09-28T04:18:31.000Z">
+<meta property="article:modified_time" content="2019-09-28T04:18:31.000Z">
+<meta property="article:author" content="d0ot">
+<meta property="article:tag" content="vim">
+<meta property="article:tag" content="neovim">
+<meta property="article:tag" content="productivity">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://d0ot.github.com/2019/09/28/Neovim-clangd/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://d0ot.github.com/2019/09/28/Neovim-clangd/","path":"2019/09/28/Neovim-clangd/","title":"Neovim + clangd Configuration"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Neovim + clangd Configuration | Doot's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Doot's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Neovim-clangd-Configuration"><span class="nav-number">1.</span> <span class="nav-text">Neovim + clangd Configuration</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Neovim"><span class="nav-number">1.1.</span> <span class="nav-text">1. Neovim</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#How-to-install"><span class="nav-number">1.1.1.</span> <span class="nav-text">How to install</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#How-to-uninstall"><span class="nav-number">1.1.2.</span> <span class="nav-text">How to uninstall</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Vim-plug"><span class="nav-number">1.2.</span> <span class="nav-text">2. Vim-plug</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-LanguageClient-neovim"><span class="nav-number">1.3.</span> <span class="nav-text">3. LanguageClient-neovim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-deoplete-nvim"><span class="nav-number">1.4.</span> <span class="nav-text">4. deoplete.nvim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Clang-and-LLVM"><span class="nav-number">1.5.</span> <span class="nav-text">5. Clang and LLVM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Edit-the-init-vim"><span class="nav-number">1.6.</span> <span class="nav-text">6. Edit the init.vim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-Enjoy"><span class="nav-number">1.7.</span> <span class="nav-text">7. Enjoy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Note"><span class="nav-number">1.8.</span> <span class="nav-text">Note</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">d0ot</p>
+  <div class="site-description" itemprop="description">random writings</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://d0ot.github.com/2019/09/28/Neovim-clangd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="d0ot">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Doot's Blog">
+      <meta itemprop="description" content="random writings">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Neovim + clangd Configuration | Doot's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Neovim + clangd Configuration
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2019-09-28 12:18:31" itemprop="dateCreated datePublished" datetime="2019-09-28T12:18:31+08:00">2019-09-28</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>For Productivity!!!</p>
+<span id="more"></span>
+
+<p>And ZhuangBility23333</p>
+<h2 id="Neovim-clangd-Configuration"><a href="#Neovim-clangd-Configuration" class="headerlink" title="Neovim + clangd Configuration"></a>Neovim + clangd Configuration</h2><h3 id="1-Neovim"><a href="#1-Neovim" class="headerlink" title="1. Neovim"></a>1. <a target="_blank" rel="noopener" href="https://github.com/neovim/neovim">Neovim</a></h3><p>I am using Ubuntu18.04 and version of neovim installed by apt is not latest. I choose the installation from source.</p>
+<h4 id="How-to-install"><a href="#How-to-install" class="headerlink" title="How to install"></a>How to install</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/neovim/neovim.git</span><br><span class="line"><span class="built_in">cd</span> neovim</span><br><span class="line">git checkout v0.4.2</span><br><span class="line">make CMAKE_BUILD_TYPE=RelWithDebInfo</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+
+<h4 id="How-to-uninstall"><a href="#How-to-uninstall" class="headerlink" title="How to uninstall"></a>How to uninstall</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="built_in">rm</span> /usr/local/bin/nvim</span><br><span class="line">sudo <span class="built_in">rm</span> -r /usr/local/share/nvim/</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-Vim-plug"><a href="#2-Vim-plug" class="headerlink" title="2. Vim-plug"></a>2. <a target="_blank" rel="noopener" href="https://github.com/junegunn/vim-plug">Vim-plug</a></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \</span><br><span class="line">    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-LanguageClient-neovim"><a href="#3-LanguageClient-neovim" class="headerlink" title="3. LanguageClient-neovim"></a>3. <a target="_blank" rel="noopener" href="https://github.com/autozimu/LanguageClient-neovim">LanguageClient-neovim</a></h3><p>Create file at <code>~/.config/nvim/init.vim</code> ,filling it with following content.</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">call</span> plug#begin(<span class="string">&#x27;~/.config/nvim/plugged&#x27;</span>)</span><br><span class="line"></span><br><span class="line">Plug <span class="string">&#x27;autozimu/LanguageClient-neovim&#x27;</span>, &#123;</span><br><span class="line">    \ <span class="string">&#x27;branch&#x27;</span>: <span class="string">&#x27;next&#x27;</span>,</span><br><span class="line">    \ <span class="string">&#x27;do&#x27;</span>: <span class="string">&#x27;bash install.sh&#x27;</span>,</span><br><span class="line">    \ &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; (Optional) Multi-entry selection UI.</span></span><br><span class="line">Plug <span class="string">&#x27;junegunn/fzf&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">call</span> plug#end()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Enter nvim and just type <code>:PlugInstall</code> + <code>Enter</code> to install LanguageClient-neovim, just wait.</p>
+<h3 id="4-deoplete-nvim"><a href="#4-deoplete-nvim" class="headerlink" title="4. deoplete.nvim"></a>4. <a target="_blank" rel="noopener" href="https://github.com/Shougo/deoplete.nvim">deoplete.nvim</a></h3><p>Add following content to <code>init.vim</code>, between <code>call plug#begin</code> and <code>call plug#end</code>.</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="built_in">has</span>(<span class="string">&#x27;nvim&#x27;</span>)</span><br><span class="line">  Plug <span class="string">&#x27;Shougo/deoplete.nvim&#x27;</span>, &#123; <span class="string">&#x27;do&#x27;</span>: <span class="string">&#x27;:UpdateRemotePlugins&#x27;</span> &#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  Plug <span class="string">&#x27;Shougo/deoplete.nvim&#x27;</span></span><br><span class="line">  Plug <span class="string">&#x27;roxma/nvim-yarp&#x27;</span></span><br><span class="line">  Plug <span class="string">&#x27;roxma/vim-hug-neovim-rpc&#x27;</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:deoplete</span>#enable_at_startup = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>After it, the file looks like this:</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">call</span> plug#begin(<span class="string">&#x27;~/.config/nvim/plugged&#x27;</span>)</span><br><span class="line"></span><br><span class="line">Plug <span class="string">&#x27;autozimu/LanguageClient-neovim&#x27;</span>, &#123;</span><br><span class="line">    \ <span class="string">&#x27;branch&#x27;</span>: <span class="string">&#x27;next&#x27;</span>,</span><br><span class="line">    \ <span class="string">&#x27;do&#x27;</span>: <span class="string">&#x27;bash install.sh&#x27;</span>,</span><br><span class="line">    \ &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; (Optional) Multi-entry selection UI.</span></span><br><span class="line">Plug <span class="string">&#x27;junegunn/fzf&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">has</span>(<span class="string">&#x27;nvim&#x27;</span>)</span><br><span class="line">  Plug <span class="string">&#x27;Shougo/deoplete.nvim&#x27;</span>, &#123; <span class="string">&#x27;do&#x27;</span>: <span class="string">&#x27;:UpdateRemotePlugins&#x27;</span> &#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  Plug <span class="string">&#x27;Shougo/deoplete.nvim&#x27;</span></span><br><span class="line">  Plug <span class="string">&#x27;roxma/nvim-yarp&#x27;</span></span><br><span class="line">  Plug <span class="string">&#x27;roxma/vim-hug-neovim-rpc&#x27;</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:deoplete</span>#enable_at_startup = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">call</span> plug#end()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-Clang-and-LLVM"><a href="#5-Clang-and-LLVM" class="headerlink" title="5. Clang and LLVM"></a>5. <a target="_blank" rel="noopener" href="https://clang.llvm.org/">Clang and LLVM</a></h3><p>how to add clang’s apt repo : <a target="_blank" rel="noopener" href="https://apt.llvm.org/">https://apt.llvm.org/</a></p>
+<p>As for Ununtu18.04, I do the following things :</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># GPG Key</span></span><br><span class="line">wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -</span><br><span class="line"></span><br><span class="line"><span class="comment"># Repo source</span></span><br><span class="line">sudo <span class="built_in">echo</span> <span class="string">&quot;deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main&quot;</span> &gt;&gt; /etc/apt/source.list</span><br><span class="line">sudo <span class="built_in">echo</span> <span class="string">&quot;deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main&quot;</span> &gt;&gt; /etc/apt/source.list</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sudo apt update</span><br><span class="line">sudo apt install clang-9</span><br><span class="line">sudo apt install clangd-9</span><br><span class="line"></span><br><span class="line"><span class="comment"># For GNU/Linux libstd++</span></span><br><span class="line"><span class="comment"># For OSX libc++</span></span><br><span class="line">sudo apt install libstdc++-8-dev</span><br><span class="line"></span><br><span class="line"><span class="comment">## Uninstall default clang and clangd before next step</span></span><br><span class="line"></span><br><span class="line">sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-9 100</span><br><span class="line">sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-9 100</span><br><span class="line">sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-9 100</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-Edit-the-init-vim"><a href="#6-Edit-the-init-vim" class="headerlink" title="6. Edit the init.vim"></a>6. Edit the init.vim</h3><p>add following content after <code>plug#end()</code></p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">&quot;make sign column always visiable</span></span><br><span class="line"><span class="keyword">set</span> signcolumn=yes</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot;make indent 4 spaces</span></span><br><span class="line"><span class="keyword">set</span> <span class="built_in">shiftwidth</span>=<span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot;enable neovim-LanguageClient</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:LanguageClient_autoStart</span> = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot;set clangd as server when it is C++</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:LanguageClient_serverCommands</span> = &#123;</span><br><span class="line">    \ <span class="string">&#x27;cpp&#x27;</span>: [<span class="string">&#x27;clangd&#x27;</span>],</span><br><span class="line">    \ &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot;set complete function for deoplete.vim</span></span><br><span class="line"><span class="keyword">set</span> completefunc=LanguageClient#complete</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="7-Enjoy"><a href="#7-Enjoy" class="headerlink" title="7. Enjoy"></a>7. Enjoy</h3><p>open <code>nvim</code> and Enjoy~~~</p>
+<h3 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h3><p>Don’t forget to generate compile_commands.json.</p>
+<p>Reference : <a target="_blank" rel="noopener" href="https://clang.llvm.org/extra/clangd/Installation.html#project-setup">GETTING STARTED WITH CLANGD</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/vim/" rel="tag"># vim</a>
+              <a href="/tags/neovim/" rel="tag"># neovim</a>
+              <a href="/tags/productivity/" rel="tag"># productivity</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/06/25/System-Learning-Daily-3/" rel="prev" title="System Learning Daily 3">
+                  <i class="fa fa-chevron-left"></i> System Learning Daily 3
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/03/29/long-live-my-blog/" rel="next" title="Long Live My Blog !">
+                  Long Live My Blog ! <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">d0ot</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

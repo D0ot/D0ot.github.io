@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha256-xejo6yLi6vGtAjcMIsY8BHdKsLg7QynVlFMzdQgUuy8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"d0ot.github.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.12.3","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="X86 Calling Convention上一篇Post最后有个疑问是，X86函数调用时，参数怎么传递，栈怎么管理。这些东西其实都是Calling conventions的内容[1]。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="System Learning Daily 2">
+<meta property="og:url" content="https://d0ot.github.com/2019/06/20/System-Learning-Daily-2/index.html">
+<meta property="og:site_name" content="Doot&#39;s Blog">
+<meta property="og:description" content="X86 Calling Convention上一篇Post最后有个疑问是，X86函数调用时，参数怎么传递，栈怎么管理。这些东西其实都是Calling conventions的内容[1]。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-06-20T03:51:07.000Z">
+<meta property="article:modified_time" content="2019-06-20T03:51:07.000Z">
+<meta property="article:author" content="d0ot">
+<meta property="article:tag" content="x86">
+<meta property="article:tag" content="system">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://d0ot.github.com/2019/06/20/System-Learning-Daily-2/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://d0ot.github.com/2019/06/20/System-Learning-Daily-2/","path":"2019/06/20/System-Learning-Daily-2/","title":"System Learning Daily 2"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>System Learning Daily 2 | Doot's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Doot's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#X86-Calling-Convention"><span class="nav-number">1.</span> <span class="nav-text">X86 Calling Convention</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9-terminal-xxx"><span class="nav-number">2.</span> <span class="nav-text">修改 _terminal_xxx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8Makefile"><span class="nav-number">3.</span> <span class="nav-text">开始使用Makefile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E-%E2%80%9CCall%E2%80%9D-%E6%8C%87%E4%BB%A4"><span class="nav-number">4.</span> <span class="nav-text">关于 “Call” 指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E-%E2%80%9Cjmp-label%E2%80%9D"><span class="nav-number">5.</span> <span class="nav-text">关于 “jmp label”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">7.</span> <span class="nav-text">Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Updates"><span class="nav-number">8.</span> <span class="nav-text">Updates</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">d0ot</p>
+  <div class="site-description" itemprop="description">random writings</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://d0ot.github.com/2019/06/20/System-Learning-Daily-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="d0ot">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Doot's Blog">
+      <meta itemprop="description" content="random writings">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="System Learning Daily 2 | Doot's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          System Learning Daily 2
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2019-06-20 11:51:07" itemprop="dateCreated datePublished" datetime="2019-06-20T11:51:07+08:00">2019-06-20</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="X86-Calling-Convention"><a href="#X86-Calling-Convention" class="headerlink" title="X86 Calling Convention"></a>X86 Calling Convention</h2><p>上一篇Post最后有个疑问是，X86函数调用时，参数怎么传递，栈怎么管理。这些东西其实都是<code>Calling conventions</code>的内容[1]。</p>
+<span id="more"></span>
+
+<hr>
+<h2 id="修改-terminal-xxx"><a href="#修改-terminal-xxx" class="headerlink" title="修改 _terminal_xxx"></a>修改 _terminal_xxx</h2><p>主要的大范围改动就是把函数调用时的参数传递由用栈来传递，改为直接使用寄存器来传递。</p>
+<p>添加_terminal_putchar，支持屏幕的滚动。</p>
+<p>修改_terminal_show，使用_terminal_putchar来显示字符。</p>
+<p>具体实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">.global _terminal_putchar</span><br><span class="line">.type _terminal_putchar STT_FUNC</span><br><span class="line"><span class="comment">/*!</span></span><br><span class="line"><span class="comment">    \brief  put a char on screen</span></span><br><span class="line"><span class="comment">            it will read content in TER_ROW and TER_COL to get correct offset</span></span><br><span class="line"><span class="comment">    \param  al the char to put</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">_terminal_putchar:</span><br><span class="line">    cmp al, <span class="string">&#x27;\n&#x27;</span></span><br><span class="line">    je tp_s1</span><br><span class="line"></span><br><span class="line"><span class="comment">// the char is not newline</span></span><br><span class="line">tp_s0:</span><br><span class="line">    push ax</span><br><span class="line">    mov ax, [TER_ROW]</span><br><span class="line">    call _terminal_getoffset</span><br><span class="line">    shl ax</span><br><span class="line">    mov bx, ax</span><br><span class="line">    mov ax, VRAM</span><br><span class="line">    mov es, ax</span><br><span class="line">    pop ax</span><br><span class="line">    mov ah, DEFCOLOR</span><br><span class="line">    mov es:[bx], ax</span><br><span class="line">    cmp byte ptr [TER_COL], WIDTH - <span class="number">1</span></span><br><span class="line">    je tp_s1</span><br><span class="line">    inc byte ptr ds:[TER_COL]</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line"><span class="comment">// the cursor should be at next line.</span></span><br><span class="line">tp_s1:</span><br><span class="line">    cmp byte ptr [TER_ROW], HEIGHT - <span class="number">1</span></span><br><span class="line">    jne tp_s2</span><br><span class="line"></span><br><span class="line"><span class="comment">// should scroll</span></span><br><span class="line">    push ds</span><br><span class="line">    call _terminal_scroll</span><br><span class="line">    pop ds</span><br><span class="line">    mov bl, HEIGHT - <span class="number">1</span></span><br><span class="line">    call _terminal_clearline <span class="comment">// clear line at bottom</span></span><br><span class="line">    sub byte ptr [TER_ROW], <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//should not scroll</span></span><br><span class="line">tp_s2:</span><br><span class="line">    inc byte ptr [TER_ROW]</span><br><span class="line">    mov byte ptr [TER_COL], <span class="number">0</span></span><br><span class="line">    mov ax, [TER_ROW]</span><br><span class="line">    call _terminal_getoffset</span><br><span class="line">    call _terminal_setcur</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line">.global _terminal_scroll</span><br><span class="line">.type _terminal_scroll STT_FUNC</span><br><span class="line"><span class="comment">/*!</span></span><br><span class="line"><span class="comment">    /brief  scroll the screen one line up</span></span><br><span class="line"><span class="comment">            it will not modify the TER_ROW and TER_COL</span></span><br><span class="line"><span class="comment">            it will not clear the line at bottom</span></span><br><span class="line"><span class="comment">            WARNING: it will change &quot;ds&quot; register</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">_terminal_scroll:</span><br><span class="line">    mov cx, ( (HEIGHT - <span class="number">1</span>) * WIDTH) / <span class="number">2</span></span><br><span class="line">    mov ax, VRAM</span><br><span class="line">    cld</span><br><span class="line">    mov ds, ax</span><br><span class="line">    mov es, ax</span><br><span class="line">    mov si, WIDTH * <span class="number">2</span></span><br><span class="line">    mov di, <span class="number">0</span></span><br><span class="line">    rep movsw</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
+
+<h2 id="开始使用Makefile"><a href="#开始使用Makefile" class="headerlink" title="开始使用Makefile"></a>开始使用Makefile</h2><p>不用CMake的原因是，汇编源文件和C源文件混合编译不太好搞（我太菜了）。不如Make来得直接。在子文件夹里面Make生成bin文件，在根文件夹里面把bin文件合成，并且拷贝到build文件夹。细节就不写出来了，没什么技术水平。</p>
+<h2 id="关于-“Call”-指令"><a href="#关于-“Call”-指令" class="headerlink" title="关于 “Call” 指令"></a>关于 “Call” 指令</h2><p>GUN AS, Intel Syntax</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">.section .data</span><br><span class="line"></span><br><span class="line">_buf1:</span><br><span class="line">.word <span class="number">0x10</span></span><br><span class="line"></span><br><span class="line">_buf2:</span><br><span class="line">.word <span class="number">0x20</span></span><br><span class="line"></span><br><span class="line">_buf3:</span><br><span class="line">.word <span class="number">0xCC</span></span><br><span class="line"></span><br><span class="line">.type _func STT_FUNC</span><br><span class="line">_func:</span><br><span class="line">    <span class="keyword">xor</span> ax, ax</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line">.section .text</span><br><span class="line">_start:</span><br><span class="line"></span><br><span class="line">    mov ax, _buf1</span><br><span class="line">    mov bx, _buf2</span><br><span class="line">    mov cx, _buf3</span><br></pre></td></tr></table></figure>
+
+<p>此时，<code>ax</code>，<code>bx</code>，<code>cx</code>的值分别为：0x10，0x20，0xCC。这里，GAS <code>mov</code> 的是内存中的内容，然后</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mov ax, OFFSET _buf1</span><br><span class="line">mov bx, OFFSET _buf2</span><br><span class="line">mov cx, OFFSET _buf3</span><br></pre></td></tr></table></figure>
+
+<p>此时，我们假定<code>.data</code>段从0x00开始，那么，<code>ax</code>，<code>bx</code>，<code>cx</code>的值会是0x00，0x02，0x04。也就是说，我们用<code>OFFSET</code>，可以得到<em>label</em>的地址。<strong>（此处存疑，OFFSET获得的是相对于段的偏移？还是获得绝对地址？似乎是获得绝对地址）</strong></p>
+<p>现在让我们来考虑<code>call</code>指令的情况：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">call _func</span><br></pre></td></tr></table></figure>
+
+<p>这显然是直接调用 _func，然后看下个例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov bx, OFFSET _func</span><br><span class="line">mov _buf1, bx</span><br><span class="line">call _buf1</span><br><span class="line">call [_buf1]</span><br></pre></td></tr></table></figure>
+
+<p>现在 <code>_buf1</code> 中存储了 <code>_func</code> 的地址。现在有上面两种写法，第一种是错的，第二种写法是对的。第一种写法就是 <code>call label</code>，第二种写法才是我们想要的：“取出<code>_buf</code>中存储的地址，<code>jmp</code>到该地址。”。</p>
+<p>这说明：在<code>mov</code>指令中和在<code>call</code>指令中出现的<em>label</em>会被GAS区别对待，他们有着不同的解释。</p>
+<p>这个问题确实困扰了我好一会。</p>
+<hr>
+<h2 id="关于-“jmp-label”"><a href="#关于-“jmp-label”" class="headerlink" title="关于 “jmp label”"></a>关于 “jmp label”</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">_start:</span><br><span class="line">    jmp label</span><br><span class="line">    jmp <span class="type">short</span> label</span><br><span class="line">label:</span><br><span class="line">    hlt</span><br><span class="line">    jmp label</span><br></pre></td></tr></table></figure>
+
+<p>这种直接<code>jmp label</code>的写法产生的机器码里面是没有绝对地址的，有的只是相对地址。把《汇编语言》[2]上面的一个例子拿过来(P.180 图9.3 转移位移的计算方法)</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">偏移地址     机器码                   汇编指令</span><br><span class="line"><span class="number">0000</span>        <span class="number">40</span>                  s:  inc ax</span><br><span class="line"><span class="number">0001</span>        EB03                    jmp s0</span><br><span class="line"><span class="number">0003</span>        BB0300                  mov bx, <span class="number">3</span></span><br><span class="line"><span class="number">0006</span>        <span class="number">43</span>                  s0: inc bx</span><br><span class="line"><span class="number">0007</span>        EBF7                    jmp s</span><br><span class="line"><span class="number">0009</span>        <span class="number">90</span>                      nop</span><br></pre></td></tr></table></figure>
+
+<p>这里0001偏移处的<code>jmp s0</code>指令生成的机器码是<code>EB03</code>，后面的<code>0x03</code>就是相对偏移地址。</p>
+<p>为什么是<code>03</code>呢？<code>0006 - 0001 = 5</code>才对啊。其实8086处理器在将机器码放入缓冲区之后（还未执行改指令），就更新了<code>IP</code>寄存器的数值，所以在执行的时候<code>IP</code>的值已经是<code>0x03</code>了，所以编译器就把<code>0x03</code>放到了指令中。后面的<code>0xF7</code>是<code>-9</code>的补码，<code>0009 - 9 = 0000</code>，正好跳到了第一条指令。如果是有着多级流水线（Pipelining）的处理器，情况会变得更加复杂一些，在这里就不废话了（不瞎说了）[3]。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总结一下以前的疑问：</p>
+<ol>
+<li><a href="/2019/06/18/System-Learning-Daily-1">System Learning Daily 1</a>， 疑问1的解答，就是该篇标题。</li>
+</ol>
+<p>新的疑问：</p>
+<ol>
+<li>不同的<code>call near, far</code>和<code>ret, retf</code>如何匹配。</li>
+</ol>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><blockquote>
+<ol>
+<li>Wikipedia, <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/X86_calling_conventions">“x86 calling conventions”</a></li>
+<li>王爽，《汇编语言》</li>
+<li>NCCGROUP, <a target="_blank" rel="noopener" href="https://www.nccgroup.trust/us/about-us/newsroom-and-events/blog/2011/september/arm-pipeline-and-gdb-oh-my/">“ARM, Pipeline and GDB, Oh My!”</a></li>
+</ol>
+</blockquote>
+<h2 id="Updates"><a href="#Updates" class="headerlink" title="Updates"></a>Updates</h2><blockquote>
+<p>2019-6-21<br>Add more content and publish the post.</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/x86/" rel="tag"># x86</a>
+              <a href="/tags/system/" rel="tag"># system</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/06/18/System-Learning-Daily-1/" rel="prev" title="System Learning Daily 1">
+                  <i class="fa fa-chevron-left"></i> System Learning Daily 1
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/06/24/Oh-My-Zsh/" rel="next" title="Oh My Zsh">
+                  Oh My Zsh <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">d0ot</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

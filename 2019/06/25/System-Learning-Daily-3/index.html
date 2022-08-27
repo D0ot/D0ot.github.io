@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha256-xejo6yLi6vGtAjcMIsY8BHdKsLg7QynVlFMzdQgUuy8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"d0ot.github.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.12.3","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="记一次工具的升级GDB 配合相关gdbinit脚本，加上内置的Python脚本支持。相当舒适。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="System Learning Daily 3">
+<meta property="og:url" content="https://d0ot.github.com/2019/06/25/System-Learning-Daily-3/index.html">
+<meta property="og:site_name" content="Doot&#39;s Blog">
+<meta property="og:description" content="记一次工具的升级GDB 配合相关gdbinit脚本，加上内置的Python脚本支持。相当舒适。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://d0ot.github.com/img/gdb_gef_python.png">
+<meta property="article:published_time" content="2019-06-25T15:35:23.000Z">
+<meta property="article:modified_time" content="2019-06-25T15:35:23.000Z">
+<meta property="article:author" content="d0ot">
+<meta property="article:tag" content="x86">
+<meta property="article:tag" content="system">
+<meta property="article:tag" content="debug">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="gdb">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://d0ot.github.com/img/gdb_gef_python.png">
+
+
+<link rel="canonical" href="https://d0ot.github.com/2019/06/25/System-Learning-Daily-3/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://d0ot.github.com/2019/06/25/System-Learning-Daily-3/","path":"2019/06/25/System-Learning-Daily-3/","title":"System Learning Daily 3"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>System Learning Daily 3 | Doot's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Doot's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B7%A5%E5%85%B7%E7%9A%84%E5%8D%87%E7%BA%A7"><span class="nav-number">1.</span> <span class="nav-text">记一次工具的升级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GDB-%E5%86%85%E7%BD%AE%E6%94%AF%E6%8C%81-Python"><span class="nav-number">2.</span> <span class="nav-text">GDB 内置支持 Python</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8Ecall%E5%92%8Cret%E7%9A%84%E5%8C%B9%E9%85%8D%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">关于call和ret的匹配问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#References"><span class="nav-number">5.</span> <span class="nav-text">References</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">d0ot</p>
+  <div class="site-description" itemprop="description">random writings</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://d0ot.github.com/2019/06/25/System-Learning-Daily-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="d0ot">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Doot's Blog">
+      <meta itemprop="description" content="random writings">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="System Learning Daily 3 | Doot's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          System Learning Daily 3
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2019-06-25 23:35:23" itemprop="dateCreated datePublished" datetime="2019-06-25T23:35:23+08:00">2019-06-25</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="记一次工具的升级"><a href="#记一次工具的升级" class="headerlink" title="记一次工具的升级"></a>记一次工具的升级</h2><p>GDB 配合相关<em>gdbinit</em>脚本，加上内置的Python脚本支持。相当舒适。</p>
+<span id="more"></span>
+
+<blockquote>
+<p>我用的是GEF[1]作为gdbinit</p>
+</blockquote>
+<p>上效果图:</p>
+<p><img src="/img/gdb_gef_python.png" alt="效果图"></p>
+<p>注意最下面<code>The target architecture is assumed to be i8086</code>，从这里开始后面的都是python脚本配置的</p>
+<h2 id="GDB-内置支持-Python"><a href="#GDB-内置支持-Python" class="headerlink" title="GDB 内置支持 Python"></a>GDB 内置支持 Python</h2><blockquote>
+<p>You can extend GDB using Python programming language.<br>From “Debugging with GDB” Tenth Edition</p>
+</blockquote>
+<p>写Bootloader的话，肯定要动态加载程序到内存的，这个调试就成了问题。</p>
+<p>我是用的方案是使用<code>objcopy</code>来得到干净的调试符号文件之后，加载到gdb里面。</p>
+<p>不过这就要对每个调试符号文件指定<code>.text</code>段的地址。</p>
+<p>手动去查看，再手动的加入太烦了。于是就查了一下GDB的手册[2]。发现了可以使用Python来扩展。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> gdb</span><br><span class="line"><span class="keyword">from</span> elftools.elf.elffile <span class="keyword">import</span> ELFFile</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">getSectionAddr</span>(<span class="params">filename, section_name</span>):</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(filename, <span class="string">&#x27;rb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        elffile = ELFFile(f)</span><br><span class="line">        dot_text = elffile.get_section_by_name(section_name)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> dot_text:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&#x27;WARNING: The section:\&quot;&#123;&#125;\&quot; dose not exists in file:\&quot;&#123;&#125;\&quot;.&#x27;</span>.<span class="built_in">format</span>(section_name, filename))</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> dot_text[<span class="string">&#x27;sh_addr&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">myGDBAutoLoadSymFile</span>(<span class="params">filename</span>):</span><br><span class="line">    addr = getSectionAddr(filename, <span class="string">&#x27;.text&#x27;</span>)</span><br><span class="line">    gdb.execute(<span class="string">&#x27;add-symbol-file &#x27;</span> + filename + <span class="string">&#x27; &#x27;</span> + <span class="built_in">hex</span>(addr))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    gdb.execute(<span class="string">&#x27;target remote localhost:1234&#x27;</span>)</span><br><span class="line">    gdb.execute(<span class="string">&#x27;set architecture i8086&#x27;</span>)</span><br><span class="line">    gdb.execute(<span class="string">&#x27;set disassembly-flavor intel&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    myGDBAutoLoadSymFile(<span class="string">&#x27;debug/boot.debug&#x27;</span>)</span><br><span class="line">    myGDBAutoLoadSymFile(<span class="string">&#x27;debug/loader.debug&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    gdb.execute(<span class="string">&#x27;b _start&#x27;</span>)</span><br><span class="line"></span><br><span class="line">main()</span><br></pre></td></tr></table></figure>
+
+<p>使用pyelftools[3]来获取<code>.text</code>段的地址。直接自动加载。</p>
+<h2 id="关于call和ret的匹配问题"><a href="#关于call和ret的匹配问题" class="headerlink" title="关于call和ret的匹配问题"></a>关于call和ret的匹配问题</h2><p>在loader里面把boot里面的函数都给封装一下，相当于可以间接远调用了。</p>
+<p>封装是这样的:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">.global _wrap_ter_show</span><br><span class="line">.type _wrap_ter_show STT_FUNC</span><br><span class="line"><span class="comment">/*!</span></span><br><span class="line"><span class="comment">    /brief  wrapping the _terminal_show function call.</span></span><br><span class="line"><span class="comment">            return with retf</span></span><br><span class="line"><span class="comment">    /param  bx is buffer address</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">_wrap_ter_show:</span><br><span class="line">    push ds</span><br><span class="line">    push es</span><br><span class="line">    mov ax, <span class="number">0</span></span><br><span class="line">    mov ds, ax</span><br><span class="line">    call [_terminal_show]</span><br><span class="line">    pop es</span><br><span class="line">    pop ds</span><br><span class="line">    retf</span><br></pre></td></tr></table></figure>
+
+<p>调用是这样的:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov bx, OFFSET _msg4</span><br><span class="line">push <span class="number">0x00</span></span><br><span class="line">push OFFSET _wrap_ter_show</span><br><span class="line">mov bp, sp</span><br><span class="line">call dword ptr ss:[bp]</span><br></pre></td></tr></table></figure>
+
+<p>这样搞，也能把这些函数直接作为中断程序了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总结一下以前的疑问：</p>
+<ol>
+<li><code>call</code>和<code>ret</code>的匹配问题，包装一下解决问题。</li>
+</ol>
+<p>新的疑问：</p>
+<ol>
+<li>在8086下搞重定位加载程序，总觉得好麻烦，不搞又觉得学的东西没价值，究竟搞不搞？</li>
+</ol>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><blockquote>
+<ol>
+<li>Github, <a target="_blank" rel="noopener" href="https://github.com/hugsy/gef">“hugsy&#x2F;gef”</a></li>
+<li>Sourceware, <a target="_blank" rel="noopener" href="https://sourceware.org/gdb/current/onlinedocs/gdb/">“Debugging with GDB”</a></li>
+<li>Github, <a target="_blank" rel="noopener" href="https://github.com/eliben/pyelftools/tree/master/elftools">“eliben&#x2F;pyelftools”</a></li>
+</ol>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/x86/" rel="tag"># x86</a>
+              <a href="/tags/system/" rel="tag"># system</a>
+              <a href="/tags/debug/" rel="tag"># debug</a>
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/gdb/" rel="tag"># gdb</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/06/24/Oh-My-Zsh/" rel="prev" title="Oh My Zsh">
+                  <i class="fa fa-chevron-left"></i> Oh My Zsh
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/09/28/Neovim-clangd/" rel="next" title="Neovim + clangd Configuration">
+                  Neovim + clangd Configuration <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">d0ot</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

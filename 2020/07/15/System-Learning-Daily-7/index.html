@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha256-xejo6yLi6vGtAjcMIsY8BHdKsLg7QynVlFMzdQgUuy8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"d0ot.github.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.12.3","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="GCC 内联汇编的使用方法的自用记录。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="System Learning Daily 7">
+<meta property="og:url" content="https://d0ot.github.com/2020/07/15/System-Learning-Daily-7/index.html">
+<meta property="og:site_name" content="Doot&#39;s Blog">
+<meta property="og:description" content="GCC 内联汇编的使用方法的自用记录。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-07-15T14:30:39.000Z">
+<meta property="article:modified_time" content="2020-07-15T14:30:39.000Z">
+<meta property="article:author" content="d0ot">
+<meta property="article:tag" content="x86">
+<meta property="article:tag" content="asm">
+<meta property="article:tag" content="gcc">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://d0ot.github.com/2020/07/15/System-Learning-Daily-7/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://d0ot.github.com/2020/07/15/System-Learning-Daily-7/","path":"2020/07/15/System-Learning-Daily-7/","title":"System Learning Daily 7"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>System Learning Daily 7 | Doot's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Doot's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#GCC-Extended-Asm"><span class="nav-number">1.</span> <span class="nav-text">GCC Extended Asm</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#asm-qualifiers"><span class="nav-number">1.1.</span> <span class="nav-text">asm-qualifiers</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#volatile"><span class="nav-number">1.1.1.</span> <span class="nav-text">volatile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#inline"><span class="nav-number">1.1.2.</span> <span class="nav-text">inline</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#goto"><span class="nav-number">1.1.3.</span> <span class="nav-text">goto</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OutputOperand"><span class="nav-number">1.2.</span> <span class="nav-text">OutputOperand</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#example-1-%E2%80%9Cinc%E2%80%9D"><span class="nav-number">1.2.1.</span> <span class="nav-text">example 1, “inc”</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#example-2-%E2%80%9Cbts%E2%80%9D"><span class="nav-number">1.2.2.</span> <span class="nav-text">example 2, “bts”</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#example-3-multiple-assembler-instructions-1"><span class="nav-number">1.2.3.</span> <span class="nav-text">example 3, multiple assembler instructions - 1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#example-4-multiple-assembler-instructions-2"><span class="nav-number">1.2.4.</span> <span class="nav-text">example 4, multiple assembler instructions - 2</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">d0ot</p>
+  <div class="site-description" itemprop="description">random writings</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://d0ot.github.com/2020/07/15/System-Learning-Daily-7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="d0ot">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Doot's Blog">
+      <meta itemprop="description" content="random writings">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="System Learning Daily 7 | Doot's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          System Learning Daily 7
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2020-07-15 22:30:39" itemprop="dateCreated datePublished" datetime="2020-07-15T22:30:39+08:00">2020-07-15</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>GCC 内联汇编的使用方法的自用记录。</p>
+<span id="more"></span>
+
+<h2 id="GCC-Extended-Asm"><a href="#GCC-Extended-Asm" class="headerlink" title="GCC Extended Asm"></a>GCC Extended Asm</h2><h3 id="asm-qualifiers"><a href="#asm-qualifiers" class="headerlink" title="asm-qualifiers"></a>asm-qualifiers</h3><p>有三个可选:</p>
+<p>volatile，inline，goto.</p>
+<h4 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h4><ol>
+<li>代码有副作用(side effect)的时候使用。</li>
+<li>如果汇编语句中没有Output内容，则默认 volatile。</li>
+<li>如果没有volatile且汇编语句的Ouput内容没有被该语句下面的代码使用，则该汇编语句有可能被编译器优化掉。</li>
+</ol>
+<h4 id="inline"><a href="#inline" class="headerlink" title="inline"></a>inline</h4><p>简单来说就是使得生成的汇编代码体积最小。</p>
+<h4 id="goto"><a href="#goto" class="headerlink" title="goto"></a>goto</h4><p>没用过，似乎也没有用的理由，跳过。</p>
+<h3 id="OutputOperand"><a href="#OutputOperand" class="headerlink" title="OutputOperand"></a>OutputOperand</h3><p>给例子，直接对比。</p>
+<p>推荐借助<code>Compiler Explorer</code>来学习以下内容。</p>
+<h4 id="example-1-“inc”"><a href="#example-1-“inc”" class="headerlink" title="example 1, “inc”"></a>example 1, “inc”</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">inc1</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">0</span>;</span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;inc %0&quot;</span> : <span class="string">&quot;=r&quot;</span>(a) : <span class="string">&quot;0&quot;</span>(a))</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">inc2</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">0</span>;</span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;inc %0&quot;</span> : <span class="string">&quot;=r&quot;</span>(a))</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">inc3</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">0</span>;</span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;inc %0&quot;</span> : : <span class="string">&quot;r&quot;</span>(a))</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">inc4</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">0</span>;</span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;inc %0&quot;</span> : <span class="string">&quot;+r&quot;</span>(a))</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>gcc 生成的无优化代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">inc1:</span><br><span class="line">        push    ebp</span><br><span class="line">        mov     ebp, esp</span><br><span class="line">        sub     esp, 16</span><br><span class="line">        mov     DWORD PTR [ebp-4], 0</span><br><span class="line">        mov     eax, DWORD PTR [ebp-4]</span><br><span class="line">        inc eax</span><br><span class="line">        mov     DWORD PTR [ebp-4], eax</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br><span class="line">inc2:</span><br><span class="line">        push    ebp</span><br><span class="line">        mov     ebp, esp</span><br><span class="line">        sub     esp, 16</span><br><span class="line">        mov     DWORD PTR [ebp-4], 0</span><br><span class="line">        inc eax</span><br><span class="line">        mov     DWORD PTR [ebp-4], eax</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br><span class="line">inc3:</span><br><span class="line">        push    ebp</span><br><span class="line">        mov     ebp, esp</span><br><span class="line">        sub     esp, 16</span><br><span class="line">        mov     DWORD PTR [ebp-4], 0</span><br><span class="line">        mov     eax, DWORD PTR [ebp-4]</span><br><span class="line">        inc eax</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br><span class="line"></span><br><span class="line">inc4:</span><br><span class="line">        push    ebp</span><br><span class="line">        mov     ebp, esp</span><br><span class="line">        sub     esp, 16</span><br><span class="line">        mov     DWORD PTR [ebp-4], 0</span><br><span class="line">        mov     eax, DWORD PTR [ebp-4]</span><br><span class="line">        inc eax</span><br><span class="line">        mov     DWORD PTR [ebp-4], eax</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>inc1() 是正确写法。</li>
+<li>inc2() 没有提前将 <code>a</code>写入<code>eax</code>。</li>
+<li>inc3() 没有在<code>eax</code>自增之后回写到<code>a</code>。</li>
+<li>inc4() 和 inc1() 有着相同的机器码，也是正确写法。不知道是不是完全相同的写法。</li>
+</ol>
+<h4 id="example-2-“bts”"><a href="#example-2-“bts”" class="headerlink" title="example 2, “bts”"></a>example 2, “bts”</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">bts1</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> b = <span class="number">2</span>;</span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;bts %0, %1&quot;</span> : <span class="string">&quot;+r&quot;</span>(a) : <span class="string">&quot;r&quot;</span>(b) : <span class="string">&quot;cc&quot;</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">bts2</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> b = <span class="number">2</span>;</span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;bts %0, %1&quot;</span> : <span class="string">&quot;=r&quot;</span>(a) : <span class="string">&quot;r&quot;</span>(b) : <span class="string">&quot;cc&quot;</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">bts3</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;bts %0, %1&quot;</span> : <span class="string">&quot;=r&quot;</span>(a) : <span class="string">&quot;0&quot;</span>(a) : <span class="string">&quot;cc&quot;</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">bts4</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;bts %0, %1&quot;</span> : <span class="string">&quot;+r&quot;</span>(a) : <span class="string">&quot;r&quot;</span>(a) : <span class="string">&quot;cc&quot;</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">bts5</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> b = <span class="number">2</span>;</span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;bts %0, %1&quot;</span> : <span class="string">&quot;=r&quot;</span>(a) : <span class="string">&quot;0&quot;</span>(b) : <span class="string">&quot;cc&quot;</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>gcc 生成的无优化代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">bts1:</span><br><span class="line">        push    ebp</span><br><span class="line">        mov     ebp, esp</span><br><span class="line">        sub     esp, 16</span><br><span class="line">        mov     DWORD PTR [ebp-4], 1</span><br><span class="line">        mov     DWORD PTR [ebp-8], 2</span><br><span class="line">        mov     edx, DWORD PTR [ebp-8]</span><br><span class="line">        mov     eax, DWORD PTR [ebp-4]</span><br><span class="line">        bts eax, edx</span><br><span class="line">        mov     DWORD PTR [ebp-4], eax</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br><span class="line">bts2:</span><br><span class="line">        push    ebp</span><br><span class="line">        mov     ebp, esp</span><br><span class="line">        sub     esp, 16</span><br><span class="line">        mov     DWORD PTR [ebp-4], 1</span><br><span class="line">        mov     DWORD PTR [ebp-8], 2</span><br><span class="line">        mov     eax, DWORD PTR [ebp-8]</span><br><span class="line">        bts eax, eax</span><br><span class="line">        mov     DWORD PTR [ebp-4], eax</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br><span class="line">bts3:</span><br><span class="line">        push    ebp</span><br><span class="line">        mov     ebp, esp</span><br><span class="line">        sub     esp, 16</span><br><span class="line">        mov     DWORD PTR [ebp-4], 1</span><br><span class="line">        mov     eax, DWORD PTR [ebp-4]</span><br><span class="line">        bts eax, eax</span><br><span class="line">        mov     DWORD PTR [ebp-4], eax</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br><span class="line">bts4:</span><br><span class="line">        push    ebp</span><br><span class="line">        mov     ebp, esp</span><br><span class="line">        sub     esp, 16</span><br><span class="line">        mov     DWORD PTR [ebp-4], 1</span><br><span class="line">        mov     edx, DWORD PTR [ebp-4]</span><br><span class="line">        mov     eax, DWORD PTR [ebp-4]</span><br><span class="line">        bts eax, edx</span><br><span class="line">        mov     DWORD PTR [ebp-4], eax</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br><span class="line"></span><br><span class="line">bts5:</span><br><span class="line">        push    ebp</span><br><span class="line">        mov     ebp, esp</span><br><span class="line">        sub     esp, 16</span><br><span class="line">        mov     DWORD PTR [ebp-4], 1</span><br><span class="line">        mov     DWORD PTR [ebp-8], 2</span><br><span class="line">        mov     eax, DWORD PTR [ebp-8]</span><br><span class="line">        bts eax, eax</span><br><span class="line">        mov     DWORD PTR [ebp-4], eax</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>bts1() 是<code>bts a b</code>的正确写法。</li>
+<li>bts2() 的<em>OutputOperands</em>前缀是<code>=</code>，则输入<code>a</code>与输出<code>b</code>都采用了同一个寄存器<code>eax</code>。</li>
+<li>bts3() 在<em>InputOperands</em>中使用<em>Operands</em>标号可以将一个<em>InputOperand</em>和一个<em>OutputOperand</em>“连接(tie)”起来，使用同一个寄存器或者同一块内存地址。</li>
+<li>bts4() 是<code>bts a a</code>的正确写法，可以吧<em>InputOperands</em>直接全部去掉。</li>
+<li>bts5() 一个”连接(tie)“的例子，使用<code>eax</code>,输入<code>b</code>把结果放入<code>a</code>中。</li>
+</ol>
+<h4 id="example-3-multiple-assembler-instructions-1"><a href="#example-3-multiple-assembler-instructions-1" class="headerlink" title="example 3, multiple assembler instructions - 1"></a>example 3, multiple assembler instructions - 1</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// multiple assembler instruction</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">mai</span><span class="params">()</span> &#123; </span><br><span class="line">    <span class="type">int</span> a = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> b = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> c = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// a = a + b + c, using ebx as strach register</span></span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(</span></span><br><span class="line"><span class="params">        <span class="string">&quot;mov ebx, 0\n\t&quot;</span></span></span><br><span class="line"><span class="params">        <span class="string">&quot;add ebx, %[a]\n\t&quot;</span></span></span><br><span class="line"><span class="params">        <span class="string">&quot;add ebx, %[b]\n\t&quot;</span></span></span><br><span class="line"><span class="params">        <span class="string">&quot;add ebx, %[c]\n\t&quot;</span></span></span><br><span class="line"><span class="params">        <span class="string">&quot;mov %[a], ebx&quot;</span></span></span><br><span class="line"><span class="params">        : [a] <span class="string">&quot;+r&quot;</span>(a)</span></span><br><span class="line"><span class="params">        : [b] <span class="string">&quot;r&quot;</span>(b), [c] <span class="string">&quot;r&quot;</span>(c)</span></span><br><span class="line"><span class="params">        : <span class="string">&quot;ebx&quot;</span>, <span class="string">&quot;cc&quot;</span></span></span><br><span class="line"><span class="params">    )</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>gcc生成的无优化代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">mai:</span><br><span class="line">        push    ebp</span><br><span class="line">        mov     ebp, esp</span><br><span class="line">        push    ebx</span><br><span class="line">        sub     esp, 16</span><br><span class="line">        mov     DWORD PTR [ebp-8], 0</span><br><span class="line">        mov     DWORD PTR [ebp-12], 1</span><br><span class="line">        mov     DWORD PTR [ebp-16], 2</span><br><span class="line">        mov     edx, DWORD PTR [ebp-12]</span><br><span class="line">        mov     ecx, DWORD PTR [ebp-16]</span><br><span class="line">        mov     eax, DWORD PTR [ebp-8]</span><br><span class="line">        mov ebx, 0</span><br><span class="line">        add ebx, eax</span><br><span class="line">        add ebx, edx</span><br><span class="line">        add ebx, ecx</span><br><span class="line">        mov eax, ebx</span><br><span class="line">        mov     DWORD PTR [ebp-8], eax</span><br><span class="line">        nop</span><br><span class="line">        mov     ebx, DWORD PTR [ebp-4]</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br></pre></td></tr></table></figure>
+
+<p>这个例子中，最下面的<code>ebx</code>告诉编译器，我们需要使用这个寄存器，所以编译器将该寄存器直接压栈保存，在<code>leave</code>中弹栈返回。</p>
+<h4 id="example-4-multiple-assembler-instructions-2"><a href="#example-4-multiple-assembler-instructions-2" class="headerlink" title="example 4, multiple assembler instructions - 2"></a>example 4, multiple assembler instructions - 2</h4><blockquote>
+<p>an example about <em>earlyclobber</em></p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">baz1</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">asm</span> <span class="title function_">volatile</span><span class="params">(</span></span><br><span class="line"><span class="params">        <span class="string">&quot;add %1, %0\n\t&quot;</span></span></span><br><span class="line"><span class="params">        <span class="string">&quot;add %1, %0&quot;</span></span></span><br><span class="line"><span class="params">        : <span class="string">&quot;+r&quot;</span> (a) : <span class="string">&quot;r&quot;</span> (<span class="number">1</span>))</span>;</span><br><span class="line">    <span class="keyword">return</span> a;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">baz2</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">asm</span> <span class="title function_">volatile</span><span class="params">(</span></span><br><span class="line"><span class="params">        <span class="string">&quot;add %1, %0\n\t&quot;</span></span></span><br><span class="line"><span class="params">        <span class="string">&quot;add %1, %0&quot;</span></span></span><br><span class="line"><span class="params">        : <span class="string">&quot;+&amp;r&quot;</span> (a) : <span class="string">&quot;r&quot;</span> (<span class="number">1</span>))</span>;</span><br><span class="line">    <span class="keyword">return</span> a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">; gcc -m32 -O2 ...`</span><br><span class="line"></span><br><span class="line">baz1:</span><br><span class="line">        mov     eax, 1</span><br><span class="line">        add eax, eax</span><br><span class="line">        add eax, eax</span><br><span class="line">        ret</span><br><span class="line">baz2:</span><br><span class="line">        mov     edx, 1</span><br><span class="line">        mov     eax, edx</span><br><span class="line">        add edx, eax</span><br><span class="line">        add edx, eax</span><br><span class="line">        ret</span><br></pre></td></tr></table></figure>
+
+<p>对于 <code>baz1()</code>来说，编译器认为对 <code>1</code>的所有读都在写<code>a</code>之前，那么<code>1</code>和<code>a</code>自然可以使用同一个寄存器<code>eax</code>来存储数据，但这是不正确的，因为并不是读都在写之前。</p>
+<p>对于 <code>baz2()</code>来说，我们使用了<code>&amp;</code>来告知编译器，所以编译器不会把一个寄存器既当做输入，又当做输出了。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/x86/" rel="tag"># x86</a>
+              <a href="/tags/asm/" rel="tag"># asm</a>
+              <a href="/tags/gcc/" rel="tag"># gcc</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/05/04/System-Learning-Daily-6/" rel="prev" title="System Learning Daily 6">
+                  <i class="fa fa-chevron-left"></i> System Learning Daily 6
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">d0ot</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
